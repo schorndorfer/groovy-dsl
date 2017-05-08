@@ -1,5 +1,5 @@
 group 'clinicalnlp'
-version '1.0-SNAPSHOT'
+version '2.0-SNAPSHOT'
 
 task wrapper(type: Wrapper) {
     gradleVersion = '3.3'
