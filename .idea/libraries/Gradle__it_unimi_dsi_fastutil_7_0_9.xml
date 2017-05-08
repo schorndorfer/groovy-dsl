@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Gradle: it.unimi.dsi:fastutil:7.0.9">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/it/unimi/dsi/fastutil/7.0.9/fastutil-7.0.9.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
