@@ -55,40 +55,72 @@ class DSL extends Script {
             }
             return annotations
         }
-
-        // -------------------------------------------------------------------------------------------------------------
-        // Extend JCas class with filtering functions
-        // -------------------------------------------------------------------------------------------------------------
-        JCas.metaClass.removeCovered = { Map args ->
-            JCas jcas = delegate
-            Collection<Annotation> anns = args.anns
-            Collection<Class<? extends Annotation>> removeTypes = args.types
-            Comparator<Annotation> comparator = args.comparator
-
-            // first remove duplicate annotations, picking one (at random) to keep
-            if (comparator == null) { comparator = new AnnotationComparator() }
-            TreeSet<Annotation> uniques = new TreeSet<Annotation>(comparator)
-            anns.each { Annotation ann ->
-                uniques.add(ann)
-            }
-
-            // next, remove annotations that are embedded inside other annotations
-            Collection<Annotation> embedded = []
-            uniques.each { Annotation ann ->
-                removeTypes.each { Class type ->
-                    embedded.addAll(JCasUtil.selectCovered(jcas, type, ann))
-                }
-            }
-            embedded.each {
-                it.removeFromIndexes()
-            }
-        }
     }
-
 
     // -----------------------------------------------------------------------------------------------------------------
     // Utility methods
     // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Create an annotation with specified attributes and add to indexes
+     */
+    static create = { JCas jcas, Map args ->
+        TOP a = args.type.newInstance(jcas)
+        args.each { k, v ->
+            if (a.metaClass.hasProperty(a, k)) {
+                if (k != 'type') {
+                    a."${k}" = v
+                }
+            }
+        }
+        a.addToIndexes()
+        return a
+    }
+
+    /**
+     * Select an annotation with specified attributes
+     */
+    static select = { JCas jcas, Map args ->
+        Class type = args.type
+        Closure filter = args.filter
+        Collection<AnnotationFS> annotations = (type != null ? JCasUtil.select(jcas, type) :
+            JCasUtil.selectAll(jcas))
+        if (filter) {
+            Collection<Annotation> filtered = []
+            annotations.each {
+                if (filter.call(it) == true) { filtered << it }
+            }
+            annotations = filtered
+        }
+        return annotations
+    }
+
+    /**
+     * Removed covered annotations
+     */
+    static removeCovered = { JCas jcas, Map args ->
+        Collection<Annotation> anns = args.anns
+        Collection<Class<? extends Annotation>> removeTypes = args.types
+        Comparator<Annotation> comparator = args.comparator
+
+        // first remove duplicate annotations, picking one (at random) to keep
+        if (comparator == null) { comparator = new AnnotationComparator() }
+        TreeSet<Annotation> uniques = new TreeSet<Annotation>(comparator)
+        anns.each { Annotation ann ->
+            uniques.add(ann)
+        }
+
+        // next, remove annotations that are embedded inside other annotations
+        Collection<Annotation> embedded = []
+        uniques.each { Annotation ann ->
+            removeTypes.each { Class type ->
+                embedded.addAll(JCasUtil.selectCovered(jcas, type, ann))
+            }
+        }
+        embedded.each {
+            it.removeFromIndexes()
+        }
+    }
 
     /**
      * Apply a set of regex patterns to a collection of annotations. For each match, apply

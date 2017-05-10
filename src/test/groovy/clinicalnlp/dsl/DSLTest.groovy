@@ -50,7 +50,7 @@ class DSLTest {
         Class.forName('clinicalnlp.dsl.DSL')
     }
 
-    AnalysisEngine engine;
+    AnalysisEngine engine
 
     @Before
     void setUp() throws Exception {
@@ -62,8 +62,7 @@ class DSLTest {
         this.engine = builder.createAggregate()
     }
 
-    @Test
-    void testJCasCreate() {
+    @Test void testJCasCreate() {
         // -------------------------------------------------------------------
         // run pipeline to generate annotations
         // -------------------------------------------------------------------
@@ -72,15 +71,14 @@ Patient has fever but no cough and pneumonia is ruled out.
 The patient does not have pneumonia or sepsis.
         """
         JCas jcas = engine.newJCas()
-        Sentence sent = jcas.create(type:Sentence, begin:0, end:text.length())
+        Sentence sent = DSL.create(jcas, [type:Sentence, begin:0, end:text.length()])
         JCas jcas2 = sent.getCAS().getJCas()
         assert jcas == jcas2
         Collection<Sentence> sents = JCasUtil.select(jcas, Sentence)
         assert sents.size() == 1
     }
 
-    @Test
-    void testJCasSelect() {
+    @Test void testJCasSelect() {
         // -------------------------------------------------------------------
         // run pipeline to generate annotations
         // -------------------------------------------------------------------
@@ -97,7 +95,7 @@ The patient does not have pneumonia or sepsis.
         // test the results by selecting annotations with
         // miscellaneous filter arguments
         // -------------------------------------------------------------------
-        assert jcas.select(type:NamedEntity).size() == 4
+        assert select(jcas, [type:NamedEntity]).size() == 4
 
         assert jcas.select(type:Sentence,
                 filter:not(contains(NamedEntity))).size() == 1
@@ -127,8 +125,7 @@ The patient does not have pneumonia or sepsis.
     }
 
 
-    @Test
-    void testApplyPattern() {
+    @Test void testApplyPattern() {
         // -------------------------------------------------------------------
         // run pipeline to generate annotations
         // -------------------------------------------------------------------

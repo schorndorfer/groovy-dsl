@@ -1,4 +1,4 @@
-package clinicalnlp.dsl.ae
+package clinicalnlp.dsl
 
 import clinicalnlp.dsl.DSL
 import com.google.common.base.Charsets
