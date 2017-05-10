@@ -1,6 +1,5 @@
 package clinicalnlp.dsl
 
-import clinicalnlp.dsl.ScriptAnnotator
 import de.tudarmstadt.ukp.dkpro.core.api.ner.type.NamedEntity
 import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Sentence
 import org.apache.uima.analysis_engine.AnalysisEngine
