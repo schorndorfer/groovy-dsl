@@ -142,7 +142,7 @@ The patient does not have pneumonia or sepsis.
         def pattern1 = ~/Patient/
         def pattern2 = ~/There|has|but/
         applyPatterns(
-            anns:sents,
+            searchSet:sents,
             patterns:[pattern1, pattern2],
             action: { AnnotationMatchResult m ->
                 jcas.create(type:Token, begin:m.start(0), end:m.end(0)) }

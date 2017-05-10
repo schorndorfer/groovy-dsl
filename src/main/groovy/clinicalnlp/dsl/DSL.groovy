@@ -6,6 +6,7 @@ import org.apache.uima.jcas.JCas
 import org.apache.uima.jcas.cas.TOP
 import org.apache.uima.jcas.tcas.Annotation
 
+import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 import static org.apache.uima.fit.util.JCasUtil.selectCovered
@@ -127,16 +128,17 @@ class DSL extends Script {
      * the specified closure action.
      */
     static applyPatterns = { Map args ->
-        Collection<Annotation> anns = args.anns
+        Collection<Annotation> searchSet = args.searchSet
         Collection<Pattern> patterns = args.patterns
         Closure action = args.action
-        anns.each { ann ->
+        searchSet.each { ann ->
             patterns.each { p ->
                 AnnotationMatchResult m = new AnnotationMatchResult(p, ann)
                 m.each { action.call(m) }
             }
         }
     }
+
 
     // -----------------------------------------------------------------------------------------------------------------
     // Filter predicates
