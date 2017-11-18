@@ -1,4 +1,4 @@
-package clinicalnlp.dsl
+package textractor
 
 import de.tudarmstadt.ukp.dkpro.core.api.ner.type.NamedEntity
 import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Sentence
@@ -18,12 +18,12 @@ import org.junit.Test
 
 import java.util.regex.Matcher
 
-import static clinicalnlp.dsl.DSL.*
+import static AnnotationHelper.*
 import static org.apache.uima.fit.factory.AnalysisEngineFactory.createEngineDescription
 import static org.apache.uima.fit.pipeline.SimplePipeline.runPipeline
 
 @Log4j
-class DSLTest {
+class AnnotationHelperTest {
     static class NamedEntityMentionMatcher extends JCasAnnotator_ImplBase {
         @Override
         void process(JCas jCas) throws AnalysisEngineProcessException {
@@ -47,7 +47,6 @@ class DSLTest {
 
     @BeforeClass
     static void setupClass() {
-        Class.forName('clinicalnlp.dsl.DSL')
     }
 
     AnalysisEngine engine
@@ -71,7 +70,7 @@ Patient has fever but no cough and pneumonia is ruled out.
 The patient does not have pneumonia or sepsis.
         """
         JCas jcas = engine.newJCas()
-        Sentence sent = DSL.create(jcas, [type:Sentence, begin:0, end:text.length()])
+        Sentence sent = AnnotationHelper.create(jcas, [type:Sentence, begin:0, end:text.length()])
         JCas jcas2 = sent.getCAS().getJCas()
         assert jcas == jcas2
         Collection<Sentence> sents = JCasUtil.select(jcas, Sentence)
@@ -97,31 +96,32 @@ The patient does not have pneumonia or sepsis.
         // -------------------------------------------------------------------
         assert select(jcas, [type:NamedEntity]).size() == 4
 
-        assert jcas.select(type:Sentence,
-                filter:not(contains(NamedEntity))).size() == 1
+        assert select(jcas,
+            [type:Sentence, filter:not(contains(NamedEntity))]).size() == 1
 
-        assert jcas.select(type:Sentence,
-                filter:and({it.coveredText.startsWith('Patient')},
-                        {it.coveredText.endsWith('out.') })).size() == 1
+        assert select(jcas,
+            [type:Sentence, filter:and({it.coveredText.startsWith('Patient')},
+                        {it.coveredText.endsWith('out.') })]).size() == 1
 
-        def sentsWithMentions = jcas.select(type:Sentence,
-                filter:contains(NamedEntity))
+        def sentsWithMentions = select(jcas,
+            [type:Sentence, filter:contains(NamedEntity)])
+
         assert sentsWithMentions.size() == 2
 
-        assert jcas.select(type:NamedEntity,
-                filter:coveredBy(sentsWithMentions[0])).size() == 3
+        assert select(jcas,
+            [type:NamedEntity, filter:coveredBy(sentsWithMentions[0])]).size() == 3
 
-        assert jcas.select(type:NamedEntity,
-                filter:not(coveredBy(sentsWithMentions[0]))).size() == 1
+        assert select(jcas,
+            [type:NamedEntity, filter:not(coveredBy(sentsWithMentions[0]))]).size() == 1
 
-        assert jcas.select(type:NamedEntity,
-                filter:between(0, 60)).size() == 3
+        assert select(jcas,
+            [type:NamedEntity, filter:between(0, 60)]).size() == 3
 
-        assert jcas.select(type:NamedEntity,
-                filter:before(60)).size() == 3
+        assert select(jcas,
+            [type:NamedEntity, filter:before(60)]).size() == 3
 
-        assert jcas.select(type:NamedEntity,
-                filter:after(60)).size() == 1
+        assert select(jcas,
+            [type:NamedEntity, filter:after(60)]).size() == 1
     }
 
 
@@ -138,16 +138,16 @@ The patient does not have pneumonia or sepsis.
         jcas.setDocumentText(text)
         runPipeline(jcas, engine)
 
-        Collection<Annotation> sents = jcas.select(type:Sentence)
+        Collection<Annotation> sents = select(jcas, [type:Sentence])
         def pattern1 = ~/Patient/
         def pattern2 = ~/There|has|but/
         applyPatterns(
             searchSet:sents,
             patterns:[pattern1, pattern2],
             action: { AnnotationMatchResult m ->
-                jcas.create(type:Token, begin:m.start(0), end:m.end(0)) }
+                create(jcas, [type:Token, begin:m.start(0), end:m.end(0)]) }
         )
-        Collection<Annotation> tokens = jcas.select(type:Token)
+        Collection<Annotation> tokens = select(jcas, [type:Token])
         assert tokens.size() == 5
         assert tokens[0].coveredText == 'Patient'
         assert tokens[1].coveredText == 'has'

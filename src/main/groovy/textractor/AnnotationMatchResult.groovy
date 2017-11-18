@@ -1,4 +1,4 @@
-package clinicalnlp.dsl
+package textractor
 
 import org.apache.uima.jcas.tcas.Annotation
 import org.codehaus.groovy.runtime.StringGroovyMethods

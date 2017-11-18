@@ -1,4 +1,4 @@
-package clinicalnlp.dsl
+package textractor
 
 import org.apache.uima.cas.text.AnnotationFS
 import org.apache.uima.fit.util.JCasUtil
@@ -6,12 +6,11 @@ import org.apache.uima.jcas.JCas
 import org.apache.uima.jcas.cas.TOP
 import org.apache.uima.jcas.tcas.Annotation
 
-import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 import static org.apache.uima.fit.util.JCasUtil.selectCovered
 
-class DSL extends Script {
+class AnnotationHelper extends Script {
 
     @Override
     Object run() {
@@ -22,44 +21,44 @@ class DSL extends Script {
     // Static initialization
     // -----------------------------------------------------------------------------------------------------------------
 
-    static {
-        // -------------------------------------------------------------------------------------------------------------
-        // Extend JCas class with create function
-        // -------------------------------------------------------------------------------------------------------------
-        JCas.metaClass.create = { Map attrs ->
-            TOP a = attrs.type.newInstance(getDelegate())
-            attrs.each { k, v ->
-                if (a.metaClass.hasProperty(a, k)) {
-                    if (k != 'type') {
-                        a."${k}" = v
-                    }
-                }
-            }
-            a.addToIndexes()
-            return a
-        }
-
-        // -------------------------------------------------------------------------------------------------------------
-        // Extend JCas class with select function
-        // -------------------------------------------------------------------------------------------------------------
-        JCas.metaClass.select = { Map args ->
-            Class type = args.type
-            Closure filter = args.filter
-            Collection<AnnotationFS> annotations = (type != null ? JCasUtil.select(getDelegate(), type) :
-                    JCasUtil.selectAll(getDelegate()))
-            if (filter) {
-                Collection<Annotation> filtered = []
-                annotations.each {
-                    if (filter.call(it) == true) { filtered << it }
-                }
-                annotations = filtered
-            }
-            return annotations
-        }
-    }
+//    static {
+//        // -------------------------------------------------------------------------------------------------------------
+//        // Extend JCas class with create function
+//        // -------------------------------------------------------------------------------------------------------------
+//        JCas.metaClass.create = { Map attrs ->
+//            TOP a = attrs.type.newInstance(getDelegate())
+//            attrs.each { k, v ->
+//                if (a.metaClass.hasProperty(a, k)) {
+//                    if (k != 'type') {
+//                        a."${k}" = v
+//                    }
+//                }
+//            }
+//            a.addToIndexes()
+//            return a
+//        }
+//
+//        // -------------------------------------------------------------------------------------------------------------
+//        // Extend JCas class with select function
+//        // -------------------------------------------------------------------------------------------------------------
+//        JCas.metaClass.select = { Map args ->
+//            Class type = args.type
+//            Closure filter = args.filter
+//            Collection<AnnotationFS> annotations = (type != null ? JCasUtil.select(getDelegate(), type) :
+//                    JCasUtil.selectAll(getDelegate()))
+//            if (filter) {
+//                Collection<Annotation> filtered = []
+//                annotations.each {
+//                    if (filter.call(it) == true) { filtered << it }
+//                }
+//                annotations = filtered
+//            }
+//            return annotations
+//        }
+//    }
 
     // -----------------------------------------------------------------------------------------------------------------
-    // Utility methods
+    // Helper functions
     // -----------------------------------------------------------------------------------------------------------------
 
     /**

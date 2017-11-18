@@ -1,4 +1,4 @@
-package clinicalnlp.dsl
+package textractor
 
 import de.tudarmstadt.ukp.dkpro.core.api.ner.type.NamedEntity
 import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Sentence
@@ -8,6 +8,8 @@ import org.apache.uima.fit.factory.AnalysisEngineFactory
 import org.apache.uima.fit.pipeline.SimplePipeline
 import org.apache.uima.jcas.JCas
 import org.junit.Test
+
+import static textractor.AnnotationHelper.*
 
 class ScriptAnnotatorTest {
 
@@ -29,7 +31,7 @@ class ScriptAnnotatorTest {
         JCas jcas = engine.newJCas()
         jcas.setDocumentText(text)
         SimplePipeline.runPipeline(jcas, engine)
-        assert jcas.select(type:Sentence).size() == 3
+        assert select(jcas, [type:Sentence]).size() == 3
 
         builder = new AggregateBuilder()
         builder.with {
@@ -43,6 +45,6 @@ class ScriptAnnotatorTest {
         jcas = engine.newJCas()
         jcas.setDocumentText(text)
         SimplePipeline.runPipeline(jcas, engine)
-        assert jcas.select(type:NamedEntity).size() == 5
+        assert select(jcas, [type:NamedEntity]).size() == 5
     }
 }

@@ -1,6 +1,5 @@
-package clinicalnlp.dsl
+package textractor
 
-import clinicalnlp.dsl.DSL
 import com.google.common.base.Charsets
 import com.google.common.io.Resources
 import groovy.util.logging.Log4j
@@ -29,9 +28,9 @@ class ScriptAnnotator extends org.apache.uima.fit.component.JCasAnnotator_ImplBa
     @Override
     void initialize(UimaContext aContext) throws ResourceInitializationException {
         super.initialize(aContext)
-        Class.forName('clinicalnlp.dsl.DSL')
+        Class.forName(AnnotationHelper.canonicalName)
         CompilerConfiguration config = new CompilerConfiguration()
-        config.setScriptBaseClass(DSL.canonicalName)
+        config.setScriptBaseClass(AnnotationHelper.canonicalName)
         GroovyShell shell = new GroovyShell(config)
 
         try {
