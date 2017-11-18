@@ -1,4 +1,4 @@
-group 'clinicalnlp'
+group 'textractor'
 version '2.0-SNAPSHOT'
 
 task wrapper(type: Wrapper) {
